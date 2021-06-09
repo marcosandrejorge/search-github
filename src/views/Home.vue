@@ -1,18 +1,42 @@
 <template>
-  <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png" />
-    <HelloWorld msg="Welcome to Your Vue.js App" />
+  <div>
+    <Search @onSearch="search" />
+    <DetailsUser v-if="showDetails" />
+    <Alert v-model="showAlert" :text="textAlert" />
   </div>
 </template>
 
 <script>
-// @ is an alias to /src
-import HelloWorld from "@/components/HelloWorld.vue";
-
+import Search from '../components/Search.vue'
+import Alert from '../components/Alert.vue'
+import DetailsUser from '../components/DetailsUser.vue'
+import { mapActions } from 'vuex'
 export default {
-  name: "Home",
   components: {
-    HelloWorld,
+    Search,
+    Alert,
+    DetailsUser,
   },
-};
+  data() {
+    return {
+      showAlert: false,
+      textAlert: '',
+      showDetails: false,
+    }
+  },
+  methods: {
+    ...mapActions('search', ['getSearch']),
+    async search($event) {
+      this.showAlert = false
+      try {
+        await this.getSearch($event)
+        this.showDetails = true
+      } catch (error) {
+        this.showDetails = false
+        this.showAlert = true
+        this.textAlert = 'Não foi posível recuperar a informação da busca'
+      }
+    },
+  },
+}
 </script>
